@@ -99,12 +99,12 @@ function initCollectionsSliderMd() {
     const el = document.querySelector(".collections-glider-md");
     if (!el) return;
 
+    const prev = resetArrow(".collection-prev-md");
+    const next = resetArrow(".collection-next-md");
+
     collectionsGliderInstanceMd = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".collection-prev-md",
-        next: ".collection-next-md",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -123,15 +123,12 @@ function initCollectionsSliderSm() {
     const el = document.querySelector(".collections-glider-sm");
     if (!el) return;
 
-    const prevArrow = document.querySelector(".collection-prev-sm");
-    const nextArrow = document.querySelector(".collection-next-sm");
+    const prev = resetArrow(".collection-prev-sm");
+    const next = resetArrow(".collection-next-sm");
 
     collectionsGliderInstanceSm = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: prevArrow,
-        next: nextArrow,
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -150,12 +147,12 @@ function initWhySliderSm() {
     const el = document.querySelector(".why-glider-sm");
     if (!el) return;
 
+    const prev = resetArrow(".why-prev");
+    const next = resetArrow(".why-next");
+
     whyGliderInstanceSm = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".why-prev",
-        next: ".why-next",
-      },
+      arrows: { prev, next },
       responsive: [
         {
           breakpoint: 670,
@@ -180,12 +177,12 @@ function initMediaSliderLg() {
     const el = document.querySelector(".media-glider");
     if (!el) return;
 
+    const prev = resetArrow(".media-prev");
+    const next = resetArrow(".media-next");
+
     new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".media-prev",
-        next: ".media-next",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -226,12 +223,12 @@ function initGallerySliderSm() {
     const el = document.querySelector(".gallery-glider-sm");
     if (!el) return;
 
+    const prev = resetArrow(".gallery-prev");
+    const next = resetArrow(".gallery-next");
+
     galleryGliderInstanceSm = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".gallery-prev",
-        next: ".gallery-next",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -249,12 +246,12 @@ function initAssortmentSlider() {
     const el = document.querySelector(".assortment-glider");
     if (!el) return;
 
+    const prev = resetArrow(".assortment-prev");
+    const next = resetArrow(".assortment-next");
+
     new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".assortment-prev",
-        next: ".assortment-next",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -266,12 +263,12 @@ function initMediaSliderLg() {
     const el = document.querySelector(".media-glider");
     if (!el) return;
 
+    const prev = resetArrow(".media-prev");
+    const next = resetArrow(".media-next");
+
     mediaGliderInstanceLg = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".media-prev",
-        next: ".media-next",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -288,12 +285,12 @@ function initMediaSliderMd() {
     const el = document.querySelector(".media-glider-md");
     if (!el) return;
 
+    const prev = resetArrow(".media-prev-md");
+    const next = resetArrow(".media-next-md");
+
     mediaGliderInstanceMd = new Glider(el, {
       slidesToShow: 1,
-      arrows: {
-        prev: ".media-prev-md",
-        next: ".media-next-md",
-      },
+      arrows: { prev, next },
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -416,4 +413,12 @@ function initGalleryModal() {
     lightbox.classList.remove("active");
     document.body.classList.remove("no-scroll");
   });
+}
+
+function resetArrow(sel) {
+  const el = document.querySelector(sel);
+  if (!el) return null;
+  const clone = el.cloneNode(true);
+  el.parentNode.replaceChild(clone, el);
+  return document.querySelector(sel);
 }
