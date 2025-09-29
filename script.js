@@ -10,11 +10,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   initNavMenu();
   initReadMoreButtons();
-  // initAssortmentSlider();
+  initAssortmentSlider(screenWidth);
   initDocumentsSlider();
   initAccordion();
   initEvents();
+
+  // media
   initGalleryModal();
+  initVideoModal();
 
   handleResize(screenWidth);
 
@@ -23,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "resize",
     debounce(() => {
       handleResize(window.innerWidth);
+      initAssortmentSlider(window.innerWidth);
     }, 200)
   );
 });
@@ -41,14 +45,14 @@ function debounce(fn, delay) {
 
 function handleResize(screenWidth) {
   // 👉 SMALL
-  if (screenWidth < 800) {
+  if (screenWidth <= 800) {
     if (!collectionsGliderInstanceSm) {
       destroyCollectionsSliderMd();
       initCollectionsSliderSm();
     }
   }
   // 👉 MEDIUM
-  else if (screenWidth < 1140) {
+  else if (screenWidth <= 1140) {
     if (!collectionsGliderInstanceMd) {
       destroyCollectionsSliderSm();
       initCollectionsSliderMd();
@@ -61,7 +65,7 @@ function handleResize(screenWidth) {
   }
 
   // WHY slider
-  if (screenWidth < 1140) {
+  if (screenWidth <= 1140) {
     if (!whyGliderInstanceSm) {
       initWhySliderSm();
     }
@@ -70,7 +74,7 @@ function handleResize(screenWidth) {
   }
 
   // gallery slider
-  if (screenWidth < 1000) {
+  if (screenWidth <= 1000) {
     if (!galleryGliderInstanceSm) {
       initGallerySliderSm();
     }
@@ -79,7 +83,7 @@ function handleResize(screenWidth) {
   }
 
   // media
-  if (screenWidth < 1140) {
+  if (screenWidth <= 1140) {
     if (!mediaGliderInstanceMd) {
       destroyMediaSliderLg();
       initMediaSliderMd();
@@ -241,23 +245,6 @@ function destroyGallerySliderSm() {
   }
 }
 
-function initAssortmentSlider() {
-  try {
-    const el = document.querySelector(".assortment-glider");
-    if (!el) return;
-
-    const prev = resetArrow(".assortment-prev");
-    const next = resetArrow(".assortment-next");
-
-    new Glider(el, {
-      slidesToShow: 1,
-      arrows: { prev, next },
-    });
-  } catch (error) {
-    console.log("Glider error:", error);
-  }
-}
-
 function initMediaSliderLg() {
   try {
     const el = document.querySelector(".media-glider");
@@ -291,6 +278,12 @@ function initMediaSliderMd() {
     mediaGliderInstanceMd = new Glider(el, {
       slidesToShow: 1,
       arrows: { prev, next },
+      responsive: [
+        {
+          breakpoint: 740,
+          settings: { slidesToShow: 2 },
+        },
+      ],
     });
   } catch (error) {
     console.log("Glider error:", error);
@@ -350,10 +343,12 @@ function initNavMenu() {
 
 function initEvents() {
   const getCallBtns = document.querySelectorAll(".popup-trigger");
+  const buyBtns = document.querySelectorAll(".assortment-card__btn"); // кнопки купить
   const modal = document.getElementById("modal");
   const closeBtn = document.getElementById("closeModal");
   const body = document.body;
 
+  // 👉 открытие модалки по .popup-trigger
   getCallBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       modal.classList.add("active");
@@ -361,11 +356,29 @@ function initEvents() {
     });
   });
 
+  // 👉 открытие модалки по "Купити"
+  buyBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      // находим ближайший .assortment-card
+      const card = btn.closest(".assortment-card");
+      const title = card
+        ?.querySelector(".assortment-card__title")
+        ?.textContent.trim();
+
+      console.log("Открыт попап для товара:", title);
+
+      modal.classList.add("active");
+      body.classList.add("no-scroll");
+    });
+  });
+
+  // 👉 закрытие по крестику
   closeBtn.addEventListener("click", () => {
     modal.classList.remove("active");
     body.classList.remove("no-scroll");
   });
 
+  // 👉 закрытие по клику на фон
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       modal.classList.remove("active");
@@ -415,10 +428,98 @@ function initGalleryModal() {
   });
 }
 
+function initVideoModal() {
+  const lightbox = document.getElementById("video-lightbox");
+  const frame = lightbox.querySelector("#yt-frame");
+  const closeBtn = lightbox.querySelector(".lightbox-close");
+
+  // делегирование: слушаем весь body
+  document.body.addEventListener("click", (e) => {
+    const preview = e.target.closest("[data-video-id]");
+    if (preview) {
+      const videoId = preview.dataset.videoId;
+      frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      lightbox.classList.add("active");
+      document.body.classList.add("no-scroll");
+    }
+  });
+
+  closeBtn.addEventListener("click", () => {
+    frame.src = "";
+    lightbox.classList.remove("active");
+    document.body.classList.remove("no-scroll");
+  });
+
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      frame.src = "";
+      lightbox.classList.remove("active");
+      document.body.classList.remove("no-scroll");
+    }
+  });
+}
+
 function resetArrow(sel) {
   const el = document.querySelector(sel);
   if (!el) return null;
   const clone = el.cloneNode(true);
   el.parentNode.replaceChild(clone, el);
   return document.querySelector(sel);
+}
+
+function initAssortmentSlider(screenWidth) {
+  console.log(1, screenWidth);
+
+  const containerLg = document.querySelector(".assortment-content-lg");
+  const containerMd = document.querySelector(".assortment-content-md");
+  const prevBtn = document.querySelector(".assortment-prev");
+  const nextBtn = document.querySelector(".assortment-next");
+  const tabs = document.querySelectorAll(".assortment-tab");
+  const contentsLg = document.querySelectorAll(".assortment-content-wrap");
+  const contentsMd = document.querySelectorAll(".assortment-content-wrap-md");
+
+  if (!prevBtn || !nextBtn || !tabs.length) return;
+
+  // 👉 ширина слайда зависит от экрана
+  let slideWidth;
+  if (screenWidth <= 1150) {
+    slideWidth = 315;
+  } else if (screenWidth <= 1280) {
+    slideWidth = 280;
+  } else if (screenWidth <= 1440) {
+    slideWidth = 315;
+  } else if (screenWidth < 1640) {
+    slideWidth = 1100;
+  } else {
+    slideWidth = 1272;
+  }
+
+  // 👉 стрелки (работают для активного контейнера)
+  nextBtn.onclick = () => {
+    const container = screenWidth <= 1440 ? containerMd : containerLg;
+    if (container) {
+      container.scrollBy({ left: slideWidth, behavior: "smooth" });
+    }
+  };
+
+  prevBtn.onclick = () => {
+    const container = screenWidth <= 1440 ? containerMd : containerLg;
+    if (container) {
+      container.scrollBy({ left: -slideWidth, behavior: "smooth" });
+    }
+  };
+
+  // 👉 табы (включаем правильный набор контента)
+  tabs.forEach((tab, index) => {
+    tab.onclick = () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      contentsLg.forEach((c) => c.classList.remove("active"));
+      contentsMd.forEach((c) => c.classList.remove("active"));
+
+      tab.classList.add("active");
+
+      if (contentsMd[index]) contentsMd[index].classList.add("active");
+      if (contentsLg[index]) contentsLg[index].classList.add("active");
+    };
+  });
 }
