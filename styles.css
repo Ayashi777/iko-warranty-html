@@ -548,7 +548,6 @@ button.navbar__button {
   position: relative;
   padding-top: 150px;
   background: url("images/hero_lg.jpg") no-repeat center center/cover;
-  height: 100vh;
   margin-top: 157px;
   max-height: 861px;
 }
